@@ -4,7 +4,8 @@
 
 ## 基本规则
 
-- 使用 Python 3.10+ 类型标注，新文件默认 `from __future__ import annotations`。
+- 默认 Python 版本约束为 `>=3.10,<3.13`，默认使用 `python3.10` 解释器创建 Poetry 环境。
+- 使用 Python 3.10 兼容的类型标注，新文件默认 `from __future__ import annotations`。
 - 模块名、函数名、变量名用小写下划线，类名用 `PascalCase`。
 - 文件只承担一个清晰职责。
 
@@ -40,7 +41,10 @@
 
 ## 依赖、注释、工具
 
-- 核心训练依赖写入项目依赖，开发测试依赖放 dev extras。
+- 核心训练依赖写入项目依赖，开发测试依赖放 dev extras；但 `torch` 及依赖 `torch` 的包除外。
+- `torch`、`torchvision`、`torchaudio`、`datasets`、`modelscope` 等 torch 生态或可能引入 torch 的包不得写入 `pyproject.toml` 的主依赖、dev 依赖或 extras，除非该声明明确为 optional 且不会进入默认 lock。
+- 交付前检查 lock 文件：除 optional 依赖声明外，不应出现 `torch` 作为直接或传递依赖。
+- torch 生态依赖只能由用户按 README 说明使用 pip 安装，不在业务代码、Poetry scripts 或测试夹具中自动安装。
 - 可选功能延迟 import，启用但缺失时抛清晰错误。
 - 不在业务代码中自动安装依赖，不写个人镜像源或缓存路径。
 - 代码能自解释时不写注释；对模型 patch、格式兼容、缓存 key、分布式指标写短说明。

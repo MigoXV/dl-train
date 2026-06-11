@@ -34,10 +34,13 @@ tests/
 ## AI 执行流程
 
 1. 先读 `README.md`、`pyproject.toml`、`src/`、`examples/` 和相关测试。
-2. 判断改动属于 config、model、data、criterion、task、checkpoint、export、CLI 还是 test。
-3. 新增任务顺序：schema -> model -> data -> criterion -> task -> metrics -> command -> example -> tests。
-4. 保持最小改动，沿用现有模式。
-5. 新增行为同步补测试并运行最小验证命令。
+2. 将当前skill的`.gitignore`挪到项目根目录，如果已经有了则直接覆盖。
+3. 先检查 git 分支状态；只能在 `feature/<任务名>` 分支完成代码修改、测试和文档更新。
+4. 判断改动属于 config、model、data、criterion、task、checkpoint、export、CLI 还是 test。
+5. 新增任务顺序：schema -> model -> data -> criterion -> task -> metrics -> command -> example -> tests。
+6. 保持最小改动，沿用现有模式。
+7. 新增行为同步补测试并运行最小验证命令。
+8. 合并前确认工作区干净；feature 分支只能通过 squash merge 合并回 `dev`。
 
 ## 质量门槛
 
@@ -46,6 +49,11 @@ tests/
 - checkpoint、resume、export 边界清晰。
 - 日志能还原配置、override、trainer 参数、指标和输出路径。
 - 默认测试不依赖真实大模型、GPU、网络或远程大数据集。
+- 默认 Python 版本约束为 `>=3.10,<3.13`，默认使用 `python3.10` 解释器创建 Poetry 环境。
+- `torch` 及依赖 `torch` 的包不得写入 `pyproject.toml`，最终 lock 文件不得出现 `torch` 传递依赖；确需声明时只能作为 optional 依赖。
+- `torch`、`torchvision`、`torchaudio`、`datasets`、`modelscope` 等 torch 生态或可能引入 torch 的包只能通过 pip 安装，并在项目 README 中写明安装命令；默认安装 torch 2.8 系列。`transformers`不会引入torch依赖，可以通过`poetry add`安装。
+- 遵循 Git Flow：`main` 只作为稳定主线，`dev` 只作为集成分支；不得直接在 `main` 或 `dev` 提交开发改动。
+- 每次开发前从 `dev` 创建 `feature/<任务名>` 分支；完成后用 squash merge 合并回 `dev`，禁止普通 merge commit；除非明确要求发布，不从 `dev` 合并到 `main`。
 
 ## 详细规范
 
@@ -54,7 +62,6 @@ tests/
 - [数据管道规范](references/03-data-pipeline.md)
 - [训练任务规范](references/04-training-task.md)
 - [实验、检查点与导出规范](references/05-experiment-checkpoint-export.md)
-- [测试与交付规范](references/06-testing-delivery.md)
 - [代码规范](references/07-code-style.md)
 
 ## 禁止事项

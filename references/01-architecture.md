@@ -15,6 +15,8 @@ src/<package>/
   exporting/
 ```
 
+项目初始化时在根目录创建 `data-bin/`、`model-bin/`、`outputs/`、`tmp-workspace/` 四个目录：`data-bin/` 用于存放数据，`model-bin/` 用于存放预训练模型和已经导出准备交付的模型，`outputs/` 通常用于存放训练的直接产物，`tmp-workspace/` 用于存放临时脚本和其他临时内容。
+
 - `commands/`：配置解析、override 合并、对象装配、启动训练或导出。
 - `configs/`：schema、默认值、字段分组、兼容字段。
 - `models/`：configuration/modeling/processing、底座兼容、`transformers` 注册。
@@ -22,8 +24,6 @@ src/<package>/
 - `tasks/`：训练步骤、验证步骤、指标、optimizer、scheduler。
 - `checkpointing/`：checkpoint 配置和 callback。
 - `exporting/`：训练产物到推理或平台格式。
-
-不要新增独立 `finetuning/` 杂物模块。
 
 ## 边界
 

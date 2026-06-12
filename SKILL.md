@@ -189,6 +189,39 @@ DataModule 应包含 dataset 加载、split 选择、字段/标签/样本数校�
 
 DataModule 不应包含 loss、optimizer、checkpoint、CLI 配置解析。
 
+### 语音任务数据集格式
+
+ASR、VAD、LID 数据集必须包含可解码的 `audio` 字段；`id` 可选但推荐提供。数据可以来自 Hugging Face 线上数据集、Parquet、`load_from_disk` 目录或本地 AudioFolder；只要列语义一致即可。本地数据优先使用 AudioFolder：
+
+```text
+dataset/
+  test/
+    audio/sample_001.wav
+    metadata.jsonl
+```
+
+AudioFolder 的 `metadata.jsonl` 中 `file_name` 必须是相对 split 目录的路径，不写绝对路径。Parquet 不需要 `file_name`，但必须有 `audio` 列或能在加载时转换为 `datasets.Audio` 的音频列。
+
+常用 AudioFolder 元数据模板放在 `templates/audiofolder-*-metadata.jsonl`；复制为目标 split 下的 `metadata.jsonl` 后，再按实际音频文件名和标签修改。
+
+ASR 必需字段为 `audio` 和 `text`：
+
+```jsonl
+{"file_name":"audio/00a81de9d20f87d04465.wav","id":"00a81de9d20f87d04465","text":"HOTEL HOTEL BRAVO THANK YOU"}
+```
+
+VAD 必需字段为 `audio` 和 `seconds`。`seconds` 推荐使用 `starts` / `durations` 两个等长数组，单位为秒：
+
+```jsonl
+{"file_name":"segment-0001.wav","id":"segment-0001","seconds":{"starts":[0.06],"durations":[27.11]}}
+```
+
+LID 必需字段为 `audio` 和 `language_id`。语种标签按原始字符串严格比较，`<others>` 表示未知语种集合：
+
+```jsonl
+{"file_name":"CN000001.wav","id":"CN000001","language_id":"en"}
+```
+
 ### 数据校验
 
 训练前必须校验：

@@ -216,6 +216,8 @@ VAD 必需字段为 `audio` 和 `seconds`。`seconds` 推荐使用 `starts` / `d
 {"file_name":"segment-0001.wav","id":"segment-0001","seconds":{"starts":[0.06],"durations":[27.11]}}
 ```
 
+VAD 数据集在转换为 Hugging Face AudioFolder 时，样本应默认切分为固定 30 秒片段；训练集、验证集和测试集的划分必须先基于原始音频完成，确保不同 split 之间不共享同一条原始录音，再在各 split 内做 30 秒切片。标注转换应优先通过 sample-level mask 完成：先将 Audition 标注转换为 mask，再按音频片段裁剪 mask，最后由 mask 还原为 seconds.starts 和 seconds.durations。转换完成后，应统计并打印每个 split 中有效音和无效音的时长及占比，用于检查数据分布。
+
 LID 必需字段为 `audio` 和 `language_id`。语种标签按原始字符串严格比较，`<others>` 表示未知语种集合：
 
 ```jsonl

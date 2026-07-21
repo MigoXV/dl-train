@@ -1,6 +1,6 @@
 # 深度学习训练框架技能
 
-该技能用于指导企业级深度学习训练框架的设计、实现和审查，覆盖配置、数据管道、任务、模型、检查点、导出、测试与交付规范。
+该技能用于指导企业级深度学习训练框架的设计、实现、迁移和审查。训练入口统一使用原生 `LightningCLI`：YAML 直接声明 Task、DataModule、logger、callbacks 和可注入 criterion，CLI 不再维护配置工厂或训练逻辑；每个 run 保存命令行覆盖后的 resolved config，并拒绝同一 run 的配置漂移。所有训练数据统一且只能通过 Hugging Face `datasets.load_dataset()` 加载。Scratch 只接受 `model_config_path`，Full/LoRA 只接受 `pretrained_model_path`，三类 Task 不共享互斥路径参数。
 
 ## Python 版本约束
 
@@ -40,7 +40,7 @@ poetry env use python3.10
 ```bash
 poetry env use python3.10
 poetry install --extras dev
-poetry run pip install "torch==2.8.*" "torchvision==0.23.*" "torchaudio==2.8.*" datasets modelscope
+poetry run pip install "torch==2.8.*" "torchvision==0.23.*" "torchaudio==2.8.*" "lightning==2.6.*" "jsonargparse[signatures]>=4.27.7" datasets modelscope
 ```
 
 默认安装 torch 2.8 系列。实际项目应根据 CPU/CUDA 版本调整 pip 命令和索引地址，但不要把这些依赖交给 Poetry 解析。

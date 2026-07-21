@@ -1,0 +1,57 @@
+seed_everything: 42
+
+trainer:
+  default_root_dir: outputs/runs/task-name-lora/run-001
+  accelerator: auto
+  devices: auto
+  precision: bf16-mixed
+  max_epochs: 10
+  log_every_n_steps: 10
+  logger:
+    class_path: lightning.pytorch.loggers.CSVLogger
+    init_args:
+      save_dir: outputs/runs
+      name: task-name-lora
+      version: run-001
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: outputs/checkpoints/task-name-lora/run-001
+        filename: epoch={epoch}-step={step}-val_loss={val_loss:.4f}
+        monitor: val_loss
+        mode: min
+        save_top_k: 3
+        save_last: true
+
+model:
+  class_path: package_name.tasks.task_name.TaskNameLoraFinetuneTask
+  init_args:
+    pretrained_model_path: model-bin/pretrained/task-name
+    lr: 0.00002
+    lora_config:
+      class_path: peft.LoraConfig
+      init_args:
+        r: 8
+        lora_alpha: 16
+        lora_dropout: 0.0
+        target_modules: [q_proj, v_proj]
+    criterion:
+      class_path: package_name.criterions.task_name.TaskNameCriterion
+      init_args: {}
+
+data:
+  class_path: package_name.tasks.task_name.TaskNameDataModule
+  init_args:
+    dataset_path: audiofolder
+    dataset_name: null
+    data_dir: data-bin/task-name
+    data_files: null
+    cache_dir: null
+    revision: null
+    streaming: false
+    train_split: train
+    val_split: validation
+    batch_size: 8
+    num_workers: 4
+
+ckpt_path: null
